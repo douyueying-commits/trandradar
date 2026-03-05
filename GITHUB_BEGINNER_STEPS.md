@@ -112,6 +112,18 @@
 ### 看不到“发布到 GitHub”
 - 先确认你已登录 VS Code 的 GitHub 账号（右下角/头像菜单）
 
+### 看不到“Run workflow”按钮
+- 不要停在 `Actions` 总览页，先点击左侧具体工作流（`Get Hot News` 或 `Check In`）
+- 打开后看页面右上角是否出现 `Run workflow`
+- 如果仍没有，先去 `Settings -> Actions -> General`：
+	- 勾选 `Allow all actions and reusable workflows`
+	- 在 `Workflow permissions` 选择 `Read and write permissions`
+- 确认你当前打开的是默认分支（通常是 `main`）上的工作流页面
+- 也可以直接打开：
+	- `https://github.com/你的用户名/你的仓库名/actions/workflows/crawler.yml`
+	- `https://github.com/你的用户名/你的仓库名/actions/workflows/clean-crawler.yml`
+- 如果你不是仓库 Owner 或没有 Write 权限，也不会显示这个按钮
+
 ### 页面打不开
 - 检查 Pages 是否启用到分支根目录 `/(root)`
 - 等 1~2 分钟再刷新
