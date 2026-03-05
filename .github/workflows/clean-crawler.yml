@@ -1,0 +1,25 @@
+name: Check In
+
+# 作用：重置 7 天计时，保持 Get Hot News 持续可用
+# 用法：每 7 天内手动运行一次（Actions -> Check In -> Run workflow）
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  del_runs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete all workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 0
+          keep_minimum_runs: 0
+          delete_workflow_by_state_pattern: "ALL"
+          delete_run_by_conclusion_pattern: "ALL"

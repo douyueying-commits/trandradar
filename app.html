@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TrendRadar 分享应用</title>
+  <meta name="description" content="TrendRadar 热点报告分享应用，可直接转发给他人使用" />
+  <meta name="theme-color" content="#2563eb" />
+  <link rel="manifest" href="app-manifest.webmanifest" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      background: #f5f7fb;
+      color: #1f2937;
+    }
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    }
+    .head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+    .title {
+      margin: 0;
+      font-size: 20px;
+    }
+    .sub {
+      margin: 4px 0 0;
+      color: #6b7280;
+      font-size: 13px;
+    }
+    .status {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: #4b5563;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+    .pill {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    button, .link-btn {
+      border: 1px solid #d1d5db;
+      background: #fff;
+      color: #111827;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    button.primary, .link-btn.primary {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #fff;
+    }
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+    .report-wrap {
+      overflow: hidden;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      min-height: 70vh;
+    }
+    iframe {
+      width: 100%;
+      height: 78vh;
+      border: 0;
+      display: block;
+      background: #fff;
+    }
+    .hint {
+      color: #6b7280;
+      font-size: 12px;
+      margin: 0;
+    }
+    .toast {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      background: #111827;
+      color: #fff;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all .2s ease;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="card">
+      <div class="head">
+        <div>
+          <h1 class="title">TrendRadar 分享应用</h1>
+          <p class="sub">把这个页面链接发给别人，即可直接查看最新热点报告</p>
+        </div>
+        <div class="actions">
+          <button id="installBtn" style="display:none;">安装到手机/桌面</button>
+          <button onclick="copyAppLink()">复制应用链接</button>
+          <button onclick="shareApp()">系统分享</button>
+          <a class="link-btn primary" href="index.html" target="_blank" rel="noopener">打开原始报告页</a>
+        </div>
+      </div>
+      <div class="status">
+        <span class="pill" id="updateTime">更新时间：读取中...</span>
+        <span class="pill" id="onlineStatus">网络状态：检测中...</span>
+      </div>
+      <p class="hint">说明：本页是应用入口，报告内容来自同目录 <code>index.html</code>，由 GitHub Actions 自动更新。</p>
+    </section>
+
+    <section class="report-wrap">
+      <iframe id="reportFrame" src="index.html" title="TrendRadar 最新报告"></iframe>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const REPORT_PATH = "index.html";
+    const frame = document.getElementById("reportFrame");
+    const updateEl = document.getElementById("updateTime");
+    const onlineEl = document.getElementById("onlineStatus");
+    const toast = document.getElementById("toast");
+
+    function showToast(text) {
+      toast.textContent = text;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 1600);
+    }
+
+    function reportUrl() {
+      return new URL(REPORT_PATH, window.location.href).toString();
+    }
+
+    async function copyText(text, successText) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast(successText);
+      } catch {
+        showToast("复制失败，请手动复制");
+      }
+    }
+
+    function copyAppLink() {
+      copyText(window.location.href, "应用链接已复制");
+    }
+
+    async function shareApp() {
+      const shareData = {
+        title: "TrendRadar 分享应用",
+        text: "给你一个可直接查看热点报告的应用链接",
+        url: window.location.href
+      };
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+        } catch {
+          // 用户取消分享
+        }
+      } else {
+        copyAppLink();
+      }
+    }
+
+    function refreshFrame() {
+      const url = new URL(REPORT_PATH, window.location.href);
+      url.searchParams.set("_t", Date.now().toString());
+      frame.src = url.toString();
+    }
+
+    async function updateReportTime() {
+      try {
+        const res = await fetch(`${REPORT_PATH}?_t=${Date.now()}`, { cache: "no-store" });
+        if (!res.ok) throw new Error("fetch failed");
+        const html = await res.text();
+
+        let matched = html.match(/更新时间[：:]\s*([^<\n]+)/);
+        if (!matched) matched = html.match(/Updated[：:]\s*([^<\n]+)/i);
+
+        if (matched && matched[1]) {
+          updateEl.textContent = `更新时间：${matched[1].trim()}`;
+        } else {
+          updateEl.textContent = "更新时间：已发布（未解析到具体时间）";
+        }
+      } catch {
+        updateEl.textContent = "更新时间：读取失败";
+      }
+    }
+
+    function updateOnlineStatus() {
+      onlineEl.textContent = `网络状态：${navigator.onLine ? "在线" : "离线"}`;
+    }
+
+    window.addEventListener("online", updateOnlineStatus);
+    window.addEventListener("offline", updateOnlineStatus);
+
+    // PWA 安装
+    let deferredPrompt = null;
+    const installBtn = document.getElementById("installBtn");
+
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      deferredPrompt = event;
+      installBtn.style.display = "inline-flex";
+    });
+
+    installBtn.addEventListener("click", async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      installBtn.style.display = "none";
+    });
+
+    // 注册 Service Worker
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("app-sw.js").catch(() => {});
+    }
+
+    // 初始加载
+    updateOnlineStatus();
+    updateReportTime();
+
+    // 每 5 分钟自动刷新报告和更新时间
+    setInterval(() => {
+      refreshFrame();
+      updateReportTime();
+    }, 5 * 60 * 1000);
+  </script>
+</body>
+</html>
