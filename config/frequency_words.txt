@@ -9,26 +9,18 @@
 # 在这里写你不想看到的词（每行一个）
 广告
 抽奖
+抗体检测
+抗体阳性
+核酸检测
 
 [WORD_GROUPS]
 
-[AI]
-AI
-人工智能
-大模型
-ChatGPT
-DeepSeek
-@20
+[AI抗体设计]
+/抗体设计|AI抗体设计|计算抗体|抗体工程|抗体优化|抗体人源化|抗体筛选|抗体发现|亲和力成熟|抗体药物设计/ => 抗体设计
+/抗体.*(AI|人工智能|机器学习|深度学习|大模型|算法)|((AI|人工智能|机器学习|深度学习|大模型|算法).*(抗体))/ => AI+抗体
+/antibody design|antibody engineering|computational antibody|in silico antibody|antibody discovery|affinity maturation|paratope|epitope|CDR/i => 抗体计算
+@50
 
-[新能源车]
-比亚迪
-特斯拉
-小米汽车
-@20
-
-[你自己的主题]
-# 把下面改成你真正关心的关键词
-# 例如：苹果、华为、黄金、美股、跨境电商...
-关键词A
-关键词B
+[抗体计算工具]
+/IgFold|DeepAb|ABlooper|AbLang|DiffAb|RosettaAntibody|AlphaFold|ESM|ProteinMPNN/i => 抗体AI工具
 @20
